@@ -327,7 +327,7 @@ namespace HelixToolkit.UWP
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
     public struct PhongPBRMaterialStruct
     {
-        public const int SizeInBytes = 4 * ( 4 + 4 * 5 + 4 + 4 + 4 + 4 * 3) + ModelStruct.SizeInBytes;
+        public const int SizeInBytes = 4 * ( 4 + 4 * 5 + 4 + 4 + 4 + 4 * 3 + 4) + ModelStruct.SizeInBytes;
 
         public const string MinTessDistanceStr = "minTessDistance"; //float
         public const string MaxTessDistanceStr = "maxTessDistance";//float
@@ -368,6 +368,8 @@ namespace HelixToolkit.UWP
 
         public const string UVTransformR1Str = "uvTransformR1";//float4
         public const string UVTransformR2Str = "uvTransformR2";//float4
+
+        public const string VertColorBlending = "vertColorBlending"; //float
     }
 
     /// <summary>
@@ -404,6 +406,8 @@ namespace HelixToolkit.UWP
         public const string HasTextureStr = "bHasTexture"; //bool
         public const string TextureScaleStr = "pTextureScale";//float;
         public const string AlphaThresholdStr = "pAlphaThreshold"; // float; 
+        public const string EnableBlendingStr = "pEnableBlending"; //bool
+        public const string BlendingFactorStr = "pBlendingFactor"; //float
     }
 
     /// <summary>
@@ -571,6 +575,7 @@ namespace HelixToolkit.UWP
         public const string BaseSampleDistance = "baseSampleDist"; //float
         public const string ActualSampleDistance = "actualSampleDist"; //float
         public const string IterationOffset = "iterationOffset"; // int or uint
+        public const string EnablePlaneAlignment = "enablePlaneAlignment"; // bool
         public const int SizeInBytes = 4 * (4 * 4 + 4 * 4 + 4 + 4 + 4);
     }
 
