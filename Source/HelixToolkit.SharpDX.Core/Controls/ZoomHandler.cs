@@ -26,14 +26,14 @@ namespace HelixToolkit.SharpDX.Core.Controls
         /// <summary>
         /// Initializes a new instance of the <see cref="ZoomHandler"/> class.
         /// </summary>
-        /// <param name="viewport">
+        /// <param name="cameraController">
         /// The viewport.
         /// </param>
         /// <param name="changeFieldOfView">
         /// if set to <c>true</c> [change field of view].
         /// </param>
-        public ZoomHandler(CameraController viewport, bool changeFieldOfView = false)
-            : base(viewport)
+        public ZoomHandler(CameraController cameraController, bool changeFieldOfView = false)
+            : base(cameraController)
         {
             this.changeFieldOfView = changeFieldOfView;
         }
@@ -285,6 +285,7 @@ namespace HelixToolkit.SharpDX.Core.Controls
             }
             Camera.LookDirection = newLookDirection;
             Camera.Position = newPosition;
+
             return true;
         }
 
