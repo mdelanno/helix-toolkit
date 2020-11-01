@@ -253,6 +253,8 @@ namespace HelixToolkit.UWP
                 }
             }
 
+            public BoundingSphere? ModelBoundingSphere { get; set; }
+
             public override Matrix CreateViewMatrix()
             {
                 return CreateLeftHandSystem ? Matrix.LookAtLH(this.Position, this.Position + this.LookDirection, this.UpDirection)
@@ -265,6 +267,24 @@ namespace HelixToolkit.UWP
                     string.Format(
                             CultureInfo.InvariantCulture, "NearPlaneDist:\t{0}", NearPlaneDistance) + "\n"
                             + string.Format(CultureInfo.InvariantCulture, "FarPlaneDist:\t{0}", FarPlaneDistance);
+            }
+
+            protected void AdjustNearAndFarPlaneDistances(bool isPerspective)
+            {
+                if (ModelBoundingSphere == null) return;
+
+                Vector3 cameraPositionToCenter = ModelBoundingSphere.Value.Center - Position;
+                Vector3 lookDirectionNormalized = LookDirection.Normalized();
+                float middle = Vector3.Dot(lookDirectionNormalized, cameraPositionToCenter);
+                float modelNear = middle - ModelBoundingSphere.Value.Radius;
+                float modelFar = middle + ModelBoundingSphere.Value.Radius;
+
+                // 10 % of the sphere diameter    
+                float margin = ModelBoundingSphere.Value.Radius * 0.2f;
+
+                float near = modelNear - margin;
+                NearPlaneDistance = isPerspective ? Math.Max(0.1f, near) : near;
+                FarPlaneDistance = Math.Max(near + 1000, modelFar + margin);
             }
         }
 
@@ -285,16 +305,17 @@ namespace HelixToolkit.UWP
 
             public override Matrix CreateProjectionMatrix(float aspectRatio)
             {
-                return this.CreateLeftHandSystem ? Matrix.OrthoLH(
-                        this.Width,
-                        (float)(this.Width / aspectRatio),
-                        this.NearPlaneDistance,
-                        Math.Min(1e15f, this.FarPlaneDistance))
+                AdjustNearAndFarPlaneDistances(isPerspective: false);
+                return CreateLeftHandSystem ? Matrix.OrthoLH(
+                        Width,
+                        Width / aspectRatio,
+                        NearPlaneDistance,
+                        Math.Min(1e15f, FarPlaneDistance))
                         : Matrix.OrthoRH(
-                        this.Width,
-                        (float)(this.Width / aspectRatio),
-                        this.NearPlaneDistance,
-                        Math.Min(1e15f, this.FarPlaneDistance));
+                        Width,
+                        Width / aspectRatio,
+                        NearPlaneDistance,
+                        Math.Min(1e15f, FarPlaneDistance));
 
             }
 
@@ -358,12 +379,15 @@ namespace HelixToolkit.UWP
 
             public override Matrix CreateProjectionMatrix(float aspectRatio)
             {
-                var fov = this.FieldOfView * Math.PI / 180;
+                float fov = FieldOfView * (float)Math.PI / 180f;
+
+                AdjustNearAndFarPlaneDistances(isPerspective: true);
+
                 Matrix projM;
-                if (this.CreateLeftHandSystem)
+                if (CreateLeftHandSystem)
                 {
                     projM = Matrix.PerspectiveFovLH(
-                        (float)fov,
+                        fov,
                         aspectRatio,
                         NearPlaneDistance,
                         FarPlaneDistance);
@@ -371,7 +395,7 @@ namespace HelixToolkit.UWP
                 else
                 {
                     projM = Matrix.PerspectiveFovRH(
-                        (float)fov, (float)aspectRatio, NearPlaneDistance, FarPlaneDistance);
+                        fov, aspectRatio, NearPlaneDistance, FarPlaneDistance);
                 }
                 if (float.IsNaN(projM.M33) || float.IsNaN(projM.M43))
                 {

@@ -6,6 +6,7 @@ Copyright (c) 2018 Helix Toolkit contributors
 using Windows.UI.Xaml;
 namespace HelixToolkit.UWP
 #else
+using System.Diagnostics;
 using System.Windows;
 #if COREWPF
 using HelixToolkit.SharpDX.Core.Cameras;

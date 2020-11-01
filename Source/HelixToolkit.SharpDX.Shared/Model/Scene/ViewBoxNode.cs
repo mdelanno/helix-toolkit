@@ -224,7 +224,7 @@ namespace HelixToolkit.UWP
 
             protected void UpdateModel(Vector3 up)
             {
-                var left = new Vector3(up.Y, up.Z, up.X);
+                var left = new Vector3(up.Z, up.Y, up.X);
                 var front = Vector3.Cross(left, up);
                 if (!isRightHanded)
                 {

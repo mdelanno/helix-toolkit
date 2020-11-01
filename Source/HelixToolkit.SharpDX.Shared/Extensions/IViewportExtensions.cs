@@ -186,29 +186,48 @@ namespace HelixToolkit.UWP
                 var aspectRatio = w / h;
 
                 var projMatrix = camera.CreateProjectionMatrix(aspectRatio);
-                
-                Vector3 v = new Vector3
-                {
-                    X = (2 * px / w - 1) / projMatrix.M11,
-                    Y = -(2 * py / h - 1) / projMatrix.M22,
-                    Z = 1 / projMatrix.M33
-                };
-                Vector3.TransformCoordinate(ref v, ref matrix, out Vector3 zf);
-                Vector3 zn;
+
+                var sharpDxViewport = new Viewport(0, 0, (int)w, (int)h);
+                Vector3 rayDirection;
+                Vector3 pointOnFarPlane = sharpDxViewport.Unproject(new Vector3(point2d.X, point2d.Y, 1), projMatrix, 
+                    viewMatrix, Matrix.Identity);
+                Vector3 pointNear = sharpDxViewport.Unproject(new Vector3(point2d.X, point2d.Y, 0), projMatrix, viewMatrix, 
+                    Matrix.Identity);
                 if (camera is PerspectiveCameraCore)
                 {
-                    zn = camera.Position;
+                    rayDirection = pointOnFarPlane - pointNear;
                 }
                 else
                 {
-                    v.Z = 0;
-                    Vector3.TransformCoordinate(ref v, ref matrix, out zn);
+                    rayDirection = camera.LookDirection;
                 }
-                Vector3 r = zf - zn;
-                r.Normalize();
+                rayDirection.Normalize();
 
-                ray = new Ray(zn + r * camera.NearPlaneDistance, r);
+                ray = new Ray(pointNear, rayDirection);
                 return true;
+
+                //Vector3 v = new Vector3
+                //{
+                //    X = (2 * px / w - 1) / projMatrix.M11,
+                //    Y = -(2 * py / h - 1) / projMatrix.M22,
+                //    Z = 1 / projMatrix.M33
+                //};
+                //Vector3.TransformCoordinate(ref v, ref matrix, out Vector3 zf);
+                //Vector3 zn;
+                //if (camera is PerspectiveCameraCore)
+                //{
+                //    zn = camera.Position;
+                //}
+                //else
+                //{
+                //    v.Z = 0;
+                //    Vector3.TransformCoordinate(ref v, ref matrix, out zn);
+                //}
+                //Vector3 r = zf - zn;
+                //r.Normalize();
+
+                //ray = new Ray(zn + r * camera.NearPlaneDistance, r);
+                //return true;
             }
             else
             {

@@ -628,20 +628,24 @@ namespace HelixToolkit.Wpf.SharpDX
             {
                 renderCanvas.ExceptionOccurred -= this.HandleRenderException;
             }
-            PresentationSource source = PresentationSource.FromVisual(this);
-            if (source != null)
-            {
-                DpiScale = Math.Max(DpiScale, Math.Max(source.CompositionTarget.TransformToDevice.M11, source.CompositionTarget.TransformToDevice.M22));
-            }
+
             if (EnableSwapChainRendering)
             {
-                hostPresenter.Content = new DPFSurfaceSwapChain(EnableDeferredRendering, BelongsToParentWindow) { DpiScale = DpiScale };
+                double dpiXScale = 1;
+                double dpiYScale = 1;
+                PresentationSource source = PresentationSource.FromVisual(this);
+                if (source != null)
+                {
+                    dpiXScale = 1.0 / source.CompositionTarget.TransformToDevice.M11;
+                    dpiYScale = 1.0 / source.CompositionTarget.TransformToDevice.M22;
+                }
+                hostPresenter.Content = new DPFSurfaceSwapChain(EnableDeferredRendering, BelongsToParentWindow) { DPIXScale = dpiXScale, DPIYScale = dpiYScale };
             }
             else
             {
-                hostPresenter.Content = new DPFCanvas(EnableDeferredRendering, BelongsToParentWindow) { DpiScale = DpiScale };
+                hostPresenter.Content = new DPFCanvas(EnableDeferredRendering, BelongsToParentWindow);
             }
-            
+
             if (this.renderHostInternal != null)
             {
                 this.renderHostInternal.Rendered -= this.RaiseRenderHostRendered;
@@ -649,7 +653,6 @@ namespace HelixToolkit.Wpf.SharpDX
             }
 
             renderCanvas = (IRenderCanvas)this.hostPresenter.Content;
-            renderCanvas.EnableDpiScale = EnableDpiScale;
             this.renderHostInternal = renderCanvas.RenderHost;
             renderCanvas.ExceptionOccurred += this.HandleRenderException;
             if (this.renderHostInternal != null)
