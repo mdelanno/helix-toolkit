@@ -554,7 +554,7 @@ namespace HelixToolkit.Wpf.SharpDX
             if (camera is PerspectiveCamera pcam)
             {
                 double disth = radius / Math.Tan(0.5 * pcam.FieldOfView * Math.PI / 180);
-                double vfov = pcam.FieldOfView / viewport.ActualWidth * viewport.ActualHeight;
+                double vfov = pcam.FieldOfView / viewport.ActualHeight * viewport.ActualWidth;
                 double distv = radius / Math.Tan(0.5 * vfov * Math.PI / 180);
 
                 double dist = Math.Max(disth, distv);
